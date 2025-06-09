@@ -1,6 +1,6 @@
 import unittest
 
-from dmx.prepare.prepare import (
+from dmx.dmx import (
     prepare_flow_cell,
     determine_sequencer,
     get_flow_cell_id,

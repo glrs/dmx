@@ -1,0 +1,22 @@
+[project]
+name = "dmx"
+version = "0.0.1"
+description = "Helper script for pre- and post-processing of demultiplexing"
+authors = [
+    { name = "Sara Sjunnebo", email = "sara.sjunnebo@scilifelab.se" }
+]
+readme = "README.md"
+
+requires-python = ">=3.11"
+dependencies = [
+    "pandas",
+    "click",
+]
+
+[project.scripts]
+dmx = "dmx.cli:cli"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.11.8",
+]

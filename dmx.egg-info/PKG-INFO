@@ -1,0 +1,11 @@
+Metadata-Version: 2.4
+Name: dmx
+Version: 0.0.1
+Summary: Helper script for pre- and post-processing of demultiplexing
+Author-email: Sara Sjunnebo <sara.sjunnebo@scilifelab.se>
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: pandas
+Requires-Dist: click
+Dynamic: license-file

@@ -1,22 +1,15 @@
-import logging
-from importlib.metadata import entry_points
-
 import click
+from dmx.dmx import prepare_demux
 
-from dmx import __version__
-
-logger = logging.getLogger(__name__)
-
-
-@click.group()
-@click.version_option(__version__)
-@click.pass_context
-def cli(ctx, config_file):
-    """Tool for preparing and managing sequencing data before and after demultiplexing."""
-    ctx.obj = {}
-    logger.debug("starting up CLI")
-
-
-# Add subcommands dynamically to the CLI
-for entry_point in entry_points(group="dmx.subcommands"):
-    cli.add_command(entry_point.load())
+@click.command()
+@click.option('-r', '--run', required=True, help='The run identifier, e.g., 20250528_LH00217_0219_A22TT52LT4.')
+def cli(run):
+    """
+    Command line interface for the dmx module.
+    
+    This CLI allows users to specify a run identifier and processes it accordingly.
+    
+    Args:
+        run (str): The run identifier, e.g., '20250528_LH00217_0219_A22TT52LT4'.
+    """
+    prepare_demux(run=run)

@@ -1,0 +1,16 @@
+LICENSE
+README.md
+pyproject.toml
+dmx/__init__.py
+dmx/cli.py
+dmx.egg-info/PKG-INFO
+dmx.egg-info/SOURCES.txt
+dmx.egg-info/dependency_links.txt
+dmx.egg-info/entry_points.txt
+dmx.egg-info/requires.txt
+dmx.egg-info/top_level.txt
+dmx/aggregate/__init__.py
+dmx/aggregate/aggregate.py
+dmx/prepare/__init__.py
+dmx/prepare/prepare.py
+tests/test_prepare.py
