@@ -6,13 +6,14 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
-def prepare_flow_cell(run):
+def prepare_flow_cell(run, lanes=None):
     """
     Prepare the flow cell for demultiplexing by locating the samplesheet,
     reading it, separating samples into groups, and generating sub-sample sheets.
 
     Args:
         flow_cell_id (str): The ID of the flow cell to prepare.
+        lanes (int, optional): The lane number to process. If None, all lanes are processed.
 
     Returns:
         None
@@ -28,6 +29,11 @@ def prepare_flow_cell(run):
     df = pd.read_csv(sample_sheet_path, comment="#", dtype=str)
 
     # Separate the samples into groups based on lane
+    if not lanes:
+        lanes = df["Lane"].unique()
+    for lane in lanes:
+        sub_sample_sheet = df[df["Lane"] == lane]
+        
     # Separate samples in each lane into groups based on index type
     # Generate sub-sample sheets for each group
     # Generate demux command for each group
@@ -83,7 +89,7 @@ def get_samplesheet_path(flow_cell_id, sequencer_type):
     Returns:
         str: The path to the samplesheet.
     """
-    sample_sheet_path = "/Users/sara.sjunnebo/code/scratch/pre_demux_testing/example_sample_sheets" #TODO: change this to a config file
+    sample_sheet_path = "/Users/sara.sjunnebo/code/scratch/pre_demux_testing/example_sample_sheets"  # TODO: change this to a config file
     if sequencer_type == "miseq":
         return os.path.join(sample_sheet_path, "SampleSheet.csv")
     elif sequencer_type == "aviti":
@@ -94,7 +100,7 @@ def get_samplesheet_path(flow_cell_id, sequencer_type):
         return os.path.join(sample_sheet_path, flow_cell_id + ".csv")
 
 
-def prepare_demux(run):
+def prepare_demux(run, lanes=None):
     """Prepare the demultiplexing commands for the given run."""
     logger.debug("Starting up predemux CLI")
-    prepare_flow_cell(run)
+    prepare_flow_cell(run, lanes)
