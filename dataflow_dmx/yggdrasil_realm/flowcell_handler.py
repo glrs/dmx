@@ -1,23 +1,18 @@
+import pathlib
+import uuid
 import asyncio
 import logging
 
 import httpcore
 import httpx
-from prefect.client import get_client
 
-# from prefect.logging import get_logger
-from lib.handlers.base_handler import BaseHandler
+# from prefect.client import get_client
 
-# from lib.realms.production.illumina.demux_flow import production_demux_flow
-from lib.realms.production.data_flow_project_test.predemux import production_demux_flow
+from yggdrasil.lib.handlers.base_handler import BaseHandler  # type: ignore
 
-# from lib.realms.production.illumina.flowcell_flow import demux_flow
-
+from core.flows.predemux import production_demux_flow
 
 DEPLOYMENT_SLUG = "production-demux/test2-demux-workflow"  # <flow>/<deployment>
-
-import pathlib
-import uuid
 
 
 def attach_prefect_file_handler():
@@ -57,16 +52,16 @@ class FlowcellHandler(BaseHandler):
         super().__init__()
         self.logger = logging.getLogger("FlowcellHandler")
 
-    async def queue_demux_run(self, run_path: str, instrument: str) -> None:
-        async with get_client() as client:
-            # 1. resolve the deployment record
-            deployment = await client.read_deployment_by_name(DEPLOYMENT_SLUG)
-            # 2. enqueue a run
-            await client.create_flow_run_from_deployment(
-                deployment.id,
-                parameters={"run_path": run_path, "instrument": instrument},
-                tags=["production", "illumina"],
-            )
+    # async def queue_demux_run(self, run_path: str, instrument: str) -> None:
+    #     async with get_client() as client:
+    #         # 1. resolve the deployment record
+    #         deployment = await client.read_deployment_by_name(DEPLOYMENT_SLUG)
+    #         # 2. enqueue a run
+    #         await client.create_flow_run_from_deployment(
+    #             deployment.id,
+    #             parameters={"run_path": run_path, "instrument": instrument},
+    #             tags=["production", "illumina"],
+    #         )
 
     async def handle_task(self, payload):
         run_path = payload["subfolder"]
@@ -78,30 +73,8 @@ class FlowcellHandler(BaseHandler):
         handler, p_logger = attach_prefect_file_handler()
         result = None
         try:
-            # 1. Run with work-pool / deployment
-            # await self.queue_demux_run(subfolder)
-            # self.logger.info("Run queued → Prefect work-pool will pick it up")
-
-            # 2. Serve the flow directly
-            # production_demux_flow.serve(
-            #     parameters={"fc_name": subfolder},
-            #     name="test3-demux-workflow",
-            #     tags=["production", "illumina"],
-            # )
-
-            # 3. Run the demux flow directly
+            # Run the demux flow directly
             result = await production_demux_flow(run_path, instrument)
-            # result = demux_flow(
-            #     subfolder=subfolder,
-            # )
-
-            # TODO: How it will be with Prefect
-            # Use async context manager
-            # async with get_client() as client:
-            #     await client.create_flow_run(
-            #         flow=demux_flow,
-            #         parameters={"subfolder": subfolder},
-            #     )
 
             self.logger.info("Flow run requested for %s", run_path)
 
