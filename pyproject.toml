@@ -26,6 +26,12 @@ dev = [
     "pytest",
 ]
 
+[project.scripts]
+dataflow-dmx = "dataflow_dmx.cli:cli"
+
+[project.entry-points."ygg.handler"]
+flowcell-dmx = "dataflow_dmx.yggdrasil_realm.flowcell_handler:FlowcellHandler"
+
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
