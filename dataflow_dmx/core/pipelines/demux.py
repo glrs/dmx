@@ -45,7 +45,7 @@ def yet_another_step(cfg: DemuxConfig):
     pass
 
 
-async def production_demux_flow(run_path: str, instrument: str):
+async def demux_ppl(run_path: str, instrument: str):
     """
     Parameters
     ----------

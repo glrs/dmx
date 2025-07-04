@@ -8,7 +8,7 @@ import httpx
 from yggdrasil.core_utils.event_types import EventType  # type: ignore
 from yggdrasil.handlers.base_handler import BaseHandler  # type: ignore
 
-from dataflow_dmx.core.flows.predemux import production_demux_flow
+from dataflow_dmx.core.pipelines.demux import demux_ppl
 
 # from prefect.client import get_client
 
@@ -77,7 +77,7 @@ class FlowcellHandler(BaseHandler):
         result = None
         try:
             # Run the demux flow directly
-            result = await production_demux_flow(run_path, instrument)
+            result = await demux_ppl(run_path, instrument)
 
             self.logger.info("Flow run requested for %s", run_path)
 

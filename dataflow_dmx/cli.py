@@ -3,7 +3,7 @@ from pathlib import Path
 
 import click
 
-from dataflow_dmx.core.flows.predemux import production_demux_flow
+from dataflow_dmx.core.pipelines.demux import demux_ppl
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
@@ -32,7 +32,7 @@ def cli(run_path: Path, instrument: str) -> None:
     \b
     $ dataflow-dmx -p /miarka/seq-data/.../A22TT52LT4 -i novaseqxplus
     """
-    asyncio.run(production_demux_flow(run_path=str(run_path), instrument=instrument))
+    asyncio.run(demux_ppl(run_path=str(run_path), instrument=instrument))
 
 
 if __name__ == "__main__":
