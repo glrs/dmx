@@ -1,16 +1,17 @@
-import pathlib
-import uuid
 import asyncio
 import logging
+import pathlib
+import uuid
 
 import httpcore
 import httpx
+from yggdrasil.core_utils.event_types import EventType  # type: ignore
+from yggdrasil.handlers.base_handler import BaseHandler  # type: ignore
+
+from dataflow_dmx.core.flows.predemux import production_demux_flow
 
 # from prefect.client import get_client
 
-from yggdrasil.lib.handlers.base_handler import BaseHandler  # type: ignore
-
-from core.flows.predemux import production_demux_flow
 
 DEPLOYMENT_SLUG = "production-demux/test2-demux-workflow"  # <flow>/<deployment>
 
@@ -48,6 +49,8 @@ def attach_prefect_file_handler():
 
 
 class FlowcellHandler(BaseHandler):
+    event_type = EventType.FLOWCELL_READY
+
     def __init__(self):
         super().__init__()
         self.logger = logging.getLogger("FlowcellHandler")
