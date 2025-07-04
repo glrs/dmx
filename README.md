@@ -35,7 +35,7 @@ pip install -e dmx
 mkdir -p /tmp/mock_fc/20250601_LH00001_0001_ABCDEFGH
 dataflow-dmx \
   --run-path /tmp/mock_fc/20250601_LH00001_0001_ABCDEFGH \
-  --instrument novaseqx
+  --instrument novaseqxplus
 ```
 
 ## 2. Using the module under Yggdrasil
@@ -73,7 +73,8 @@ Log line:
 
 When the `SeqDataWatcher` emits a `FLOWCELL_READY` event the handler
 executes `production_demux_flow()` asynchronously.
-As of writing this, you have to trigger an event manually if you want to play with it.
+As of writing this, you have to trigger an event manually or fake a real
+event for Yggdrasil to capture automatically if you want to play with it.
 
 
 ## 3. Repository overview
