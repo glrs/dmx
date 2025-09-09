@@ -21,7 +21,7 @@ from dataflow_dmx.core.pipelines.demux import demux_ppl
     required=True,
     metavar="KEY",
     help="Instrument key understood by the adapters "
-    "(miseq | novaseq6000 | novaseqxplus | aviti | promethion)",
+    "(miseq | nextseq | novaseqxplus | aviti | promethion)",
 )
 def cli(run_path: Path, instrument: str) -> None:
     """
