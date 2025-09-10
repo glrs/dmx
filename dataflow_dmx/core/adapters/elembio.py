@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 
 from dataflow_dmx.core.adapters.base import DemuxConfig  # type: ignore
 from dataflow_dmx.core.adapters.base import InstrumentAdapter
@@ -36,10 +37,38 @@ class AvitiAdapter(ElementAdapterMixin):
         return bool(AVITI_RUNID_RE.match(run_id))
 
     def extract_flowcell_id(self) -> str:
-        # TODO: Check if this is correct for Aviti
-        return self.run_id.split("_")[2]
+        """
+        Return side+flowcell (e.g. 'A2247654903').
+        Fail fast if run_id is malformed.
+        """
+        m = AVITI_RUNID_RE.match(self.run_id)
+        if not m:
+            # Raise early with context;
+            raise ValueError(
+                f"{self.name}: run_id {self.run_id!r} does not match Aviti pattern "
+                r"'YYYYMMDD_AV<digits>_<side><flowcell>'"
+            )
+        return f"{m.group('side')}{m.group('flowcell')}"
+
+    def _aviti_lanes(self) -> list[int]:
+        """
+        Placeholder: read 'AnalysisLanes' from RunParameters.json to get the number of lanes used (1-2).
+        "Production-team" can implement the exact JSON parsing; default conservatively to returning [1].
+        """
+        return [1]
+
+    def _samplesheet_path(self) -> Path | None:
+        """
+        Placeholder: LIMS provides SampleSheet; transport TBD (StatusDB, bundled w/ run, etc.).
+        Return None until the decision is implemented. Could be Path or the whole samplesheet content.
+        """
+        return None
 
     def build_demux_config(self) -> DemuxConfig:
+        flowcell = self.extract_flowcell_id()
+        lanes = self._aviti_lanes()
+        samplesheet = self._samplesheet_path()
+
         cmd = [
             str(AVITI_DEMUX),
             "--input",
@@ -48,10 +77,13 @@ class AvitiAdapter(ElementAdapterMixin):
             "/ngi/fastq",
         ]  # Example command, adjust as needed
 
+        if samplesheet:
+            cmd += ["--sample-sheet", str(samplesheet)]
+
         return DemuxConfig(
             run_id=self.run_id,
-            flowcell_id=self.extract_flowcell_id(),
-            lanes=[],  # Does Aviti have lanes? If so, how to extract them?
-            samplesheet_path=None,  # Does Aviti operate with samplesheets? If so, how to retrieve them?
+            flowcell_id=flowcell,
+            lanes=lanes,
+            samplesheet_path=samplesheet,
             cmd=cmd,
         )
