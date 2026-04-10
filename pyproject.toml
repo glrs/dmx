@@ -26,14 +26,20 @@ dev = [
 ]
 
 [project.scripts]
-dataflow-dmx = "dataflow_dmx.cli:cli"
+# dataflow-dmx = "dataflow_demux.cli:cli" # Disabled until migrated
 
-[project.entry-points."ygg.handler"]
-flowcell-dmx = "dataflow_dmx.yggdrasil_realm.flowcell_handler:FlowcellHandler"
+[project.entry-points."ygg.realm"]
+dmx_realm = "dataflow_demux.yggdrasil_realm.descriptor:get_realm_descriptor"
 
 [build-system]
 requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-packages = ["dataflow_dmx"]
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.pyright]
+extraPaths = ["../Yggdrasil"]
+
+[tool.mypy]
+mypy_path = ["../Yggdrasil"]
