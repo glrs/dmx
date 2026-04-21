@@ -59,7 +59,7 @@ class DemuxHandler(BaseHandler):
         logger.info(f"Planning demux triggered by {source_db}")
 
         demux_db = ctx.data.couchdb("demux_sample_info_db")
-        yfc_db = ctx.data.couchdb("flowcell_status_db")
+        fc_db = ctx.data.couchdb("flowcell_status_db")
 
         if source_db == "demux_sample_info":
             # CouchDB 3.x ignores include_docs via POST body (IBM SDK limitation),
@@ -86,7 +86,7 @@ class DemuxHandler(BaseHandler):
                     ctx, "demux_sample_info document missing flowcell_id."
                 )
 
-            yfc_doc = await yfc_db.find_one(
+            fc_doc = await fc_db.find_one(
                 {"flowcell_id": {"$in": [canonical_fcid, f"A{canonical_fcid}"]}}
             )
 
@@ -100,8 +100,8 @@ class DemuxHandler(BaseHandler):
                     "flowcell_status trigger missing canonical flowcell_id in scope.",
                 )
 
-            yfc_doc = payload.get("doc") or None
-            if not yfc_doc:
+            fc_doc = payload.get("doc") or None
+            if not fc_doc:
                 return self._deferred(
                     ctx, "flowcell_status trigger missing document in payload."
                 )
@@ -112,7 +112,7 @@ class DemuxHandler(BaseHandler):
 
         logger.info(f"Planning demux for {canonical_fcid} triggered by {source_db}")
 
-        if not yfc_doc:
+        if not fc_doc:
             return self._deferred(
                 ctx,
                 f"No flowcell_status document found for flowcell_id '{canonical_fcid}'.",
@@ -124,7 +124,7 @@ class DemuxHandler(BaseHandler):
             )
 
         # Readiness Checks
-        events = yfc_doc.get("events", [])
+        events = fc_doc.get("events", [])
         transferred_event = self._get_last_event(events, "transferred_to_hpc")
         final_transfer_event = self._get_last_event(events, "final_transfer_started")
 
@@ -144,7 +144,7 @@ class DemuxHandler(BaseHandler):
                 ctx, "final_transfer_started event missing destination_path."
             )
 
-        runfolder_id = yfc_doc.get("runfolder_id", yfc_doc.get("runfolder_name"))
+        runfolder_id = fc_doc.get("runfolder_id", fc_doc.get("runfolder_name"))
         if not runfolder_id:
             return self._deferred(ctx, "flowcell_status missing runfolder_id.")
 
@@ -167,8 +167,8 @@ class DemuxHandler(BaseHandler):
             "runfolder_id": runfolder_id,
             "samplesheet_payload": selected_samplesheet,
             "flowcell_status_doc": {
-                "_id": yfc_doc.get("_id"),
-                "_rev": yfc_doc.get("_rev"),
+                "_id": fc_doc.get("_id"),
+                "_rev": fc_doc.get("_rev"),
             },
             "demux_sample_info_doc": {
                 "_id": demux_doc.get("_id"),
